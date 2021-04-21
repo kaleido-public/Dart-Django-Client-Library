@@ -1,3 +1,3 @@
 abstract class Model {
-  double id;
+  abstract double id;
 }
