@@ -2,7 +2,8 @@ import 'dart:mirrors';
 
 abstract class Model {
   final _properties = new Map<String, Object>();
-  
+  abstract int id;
+
   noSuchMethod(Invocation invocation) {
     if (invocation.isAccessor) {
       final realName = MirrorSystem.getName(invocation.memberName);
@@ -19,5 +20,4 @@ abstract class Model {
     }
     return super.noSuchMethod(invocation);
   }
-  abstract double id;
 }

@@ -3,9 +3,9 @@ import './ObjectManager.dart';
 import './Activator.dart';
 
 class PageResult<T extends Model> {
-  double page = 0;
-  double limit = 0;
-  double total = 0;
+  int page = 0;
+  int limit = 0;
+  int total = 0;
   String previous = "";
   String next = "";
   List<T> objects = [];
