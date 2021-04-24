@@ -1,12 +1,13 @@
 import 'package:dart_django_client_library/src/Model.dart';
-import 'ItemCreatorType.dart';
 import 'package:http/http.dart';
 import 'dart:mirrors';
+import './ItemCreatorType.dart';
+import './Activator.dart';
 
 class ObjectManager<T extends Model> {
   T? original;
   T? updated;
-  ItemCreator<T>? creator;
+  ItemCreator<T> creator;
   final _properties = new Map<String, Object>();
 
   @override
@@ -62,10 +63,14 @@ class ObjectManager<T extends Model> {
     return super.noSuchMethod(invocation);
   }
 
+  T T_constructor() {
+    return Activator.createInstance(T);
+  }
+
   // TODO: clarify whether or not ObjectManager is supposed to inherit all the fields of 
-  // @model when constructed
+  // @model when constructed. If it is, need to initialize _properties as well
   ObjectManager(T model, ItemCreator<T> this.creator) {
-    T original_temp = this.creator!();
+    T original_temp = this.creator();
     InstanceMirror original_instance = reflect(original_temp);
     InstanceMirror im = reflect(model);
     ClassMirror classMirror = reflectClass(T);
@@ -81,5 +86,18 @@ class ObjectManager<T extends Model> {
     this.original = original_instance.reflectee;
 
     this.updated = model;
+  }
+
+  String get model_name {
+    InstanceMirror updated_mirror = reflect(this.updated);
+    return updated_mirror.type.reflectedType.toString().toLowerCase();
+  }
+
+  String get object_url {
+    return '/${this.model_name}/${this.original!.id}';
+  }
+
+  Model get model {
+    return this.updated!;
   }
 }
