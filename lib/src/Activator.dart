@@ -1,5 +1,8 @@
 import 'dart:mirrors';
 
+// taken from https://stackoverflow.com/questions/23112130/creating-an-instance-of-a-generic-type-in-dart
+// For creating an object from a generic type T. Different from ItemCreator as this one doesn't require
+// a constructor to be passed in as a parameter, it just calls the static createInstance function.
 class Activator {
   static createInstance(Type type, [Symbol? constructor, List?
       arguments, Map<Symbol, dynamic>? namedArguments]) {
