@@ -17,7 +17,7 @@ class CollectionManager<T extends Model> extends AbstractCollectionManager {
 
   Future<ObjectManager<T>> create(data) async {
     var object = await httpDriverImpl.request_decode(this.creator, "POST", this.collection_url, data: data);
-    return new ObjectManager<T>(object, this.creator);
+    return new ObjectManager<T>(object);
   }
 
   Future<ObjectManager<T>> get_or_create(obj) async {
@@ -30,7 +30,7 @@ class CollectionManager<T extends Model> extends AbstractCollectionManager {
       var create_input_obj = {...query, ...defaults};
       return this.create(create_input_obj);
     } else if (page.total == 1) {
-      return new ObjectManager<T>(page.objects[0], this.creator);
+      return new ObjectManager<T>(page.objects[0]);
     } else {
       throw CustomException('.get() must receive exactly one object, but got ${page.total}');
     }
@@ -45,7 +45,7 @@ class CollectionManager<T extends Model> extends AbstractCollectionManager {
     if (page.total == 0) {
       return this.create({...query, ...defaults});
     } else if (page.total == 1) {
-      var manager = new ObjectManager<T>(page.objects[0], this.creator);
+      var manager = new ObjectManager<T>(page.objects[0]);
       manager.update(defaults);
       return manager;
     } else {

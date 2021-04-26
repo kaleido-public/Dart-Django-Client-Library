@@ -1,14 +1,13 @@
 import 'package:dart_django_client_library/src/Model.dart';
-import 'package:http/http.dart';
 import 'dart:mirrors';
 import './ItemCreatorType.dart';
-import './Activator.dart';
 import './AjaxDriver.dart';
+import './helpers.dart';
 
 class ObjectManager<T extends Model> {
   T? original;
   T? updated;
-  ItemCreator<T> creator;
+  T Function() creator = T_constructor();
   final _properties = new Map<String, Object>();
 
   @override
@@ -64,13 +63,9 @@ class ObjectManager<T extends Model> {
     return super.noSuchMethod(invocation);
   }
 
-  T T_constructor() {
-    return Activator.createInstance(T);
-  }
-
   // TODO: clarify whether or not ObjectManager is supposed to inherit all the fields of 
   // @model when constructed. If it is, need to initialize _properties as well
-  ObjectManager(T model, ItemCreator<T> this.creator) {
+  ObjectManager(T model) {
     T original_temp = this.creator();
     InstanceMirror original_instance = reflect(original_temp);
     InstanceMirror im = reflect(model);
@@ -97,18 +92,6 @@ class ObjectManager<T extends Model> {
   String get object_url {
     return '/${this.model_name}/${this.original!.id}';
   }
-
-  // void print_names<T extends Model>(T model) {
-  //   InstanceMirror model_instance = reflect(model);
-  //   ClassMirror cm = model_instance.type;
-
-  //   for (var attribute in cm.declarations.values) {
-  //     if (attribute is VariableMirror) {
-  //       var attributeName = MirrorSystem.getName(attribute.simpleName);
-  //       print('key: ${attributeName} value: ${model_instance.getField(Symbol(attributeName))}');
-  //     }
-  //   }
-  // }
   
   Future delete() async {
     return httpDriverImpl.request_void('DELETE', this.object_url, {});
@@ -124,9 +107,9 @@ class ObjectManager<T extends Model> {
     const to_send = const {};
 
     // for searching _properties of this.updated
-    this.updated!.properties.forEach((key, val) => {
-      if (val != this.original!.properties[key]) {to_send[key] = val}
-    });
+    // this.updated!.properties.forEach((key, val) => {
+    //   if (val != this.original!.properties[key]) {to_send[key] = val}
+    // });
 
     InstanceMirror updated_instance = reflect(this.updated);
     InstanceMirror original_instance = reflect(this.original);

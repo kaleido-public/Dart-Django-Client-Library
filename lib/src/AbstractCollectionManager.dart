@@ -34,6 +34,6 @@ abstract class AbstractCollectionManager<T extends Model> {
       throw CustomException('.get() must receive exactly 1 object, but got ${page.total}');
     }
 
-    return new ObjectManager<T>(page.objects[0], this.creator);
+    return new ObjectManager<T>(page.objects[0]);
   }
 }

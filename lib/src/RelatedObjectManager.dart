@@ -23,8 +23,9 @@ class RelatedObjectManager<T extends Model, P extends Model> {
   Future<ObjectManager<T>> get() async {
     try {
       var model = await httpDriverImpl.request_decode(this.creator, 'GET', this.object_url);
-      return new ObjectManager<T>(model, this.creator);
+      return new ObjectManager<T>(model);
     } catch (error) {
+      // TODO: handle case where error is 404: how to get code?
       throw error;
     }
   }

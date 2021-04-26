@@ -34,6 +34,6 @@ class PageResult<T extends Model> {
   }
 
   List<ObjectManager<T>> get managers {
-    return this.objects.map((val) => new ObjectManager(val, T_constructor)).toList();
+    return this.objects.map((val) => new ObjectManager(val)).toList();
   }
 }
