@@ -4,6 +4,10 @@ abstract class Model {
   final _properties = new Map<String, Object>();
   abstract int id;
 
+  Map<String, Object> get properties {
+    return _properties;
+  }
+
   noSuchMethod(Invocation invocation) {
     if (invocation.isAccessor) {
       final realName = MirrorSystem.getName(invocation.memberName);

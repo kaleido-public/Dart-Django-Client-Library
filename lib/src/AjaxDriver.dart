@@ -5,13 +5,14 @@ import 'package:dart_django_client_library/src/Model.dart';
 import './PageResult.dart';
 import 'package:http/http.dart' as http;
 import 'dart:mirrors';
+import './CustomException.dart';
 
 var REQUEST_ID = 0;
 
 abstract class HttpDriver {
   Future request(String method, String url, data);
   
-  Future<T> request_decode<T extends Model> (ItemCreator<T> creator, String method, String url, data);
+  Future<T> request_decode<T extends Model> (ItemCreator<T> creator, String method, String url, {data});
   
   Future<PageResult<T>> request_decode_page<T extends Model>(ItemCreator<T> creator, 
   String method, String url, data);
@@ -139,7 +140,7 @@ class HttpDriverImpl implements HttpDriver {
     }
   }
 
-  Future<T> request_decode<T extends Model> (ItemCreator<T> creator, String method, String url, data) async {
+  Future<T> request_decode<T extends Model> (ItemCreator<T> creator, String method, String url, {data}) async {
     var response = await this.request(method, url, data);
     return JSONDecoder.decode_model(creator, response.body);
   }
@@ -165,7 +166,4 @@ class HttpDriverImpl implements HttpDriver {
   }
 }
 
-class CustomException implements Exception {
-  String cause;
-  CustomException(this.cause);
-}
+var httpDriverImpl = new HttpDriverImpl();

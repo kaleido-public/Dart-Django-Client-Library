@@ -3,6 +3,7 @@ import 'package:http/http.dart';
 import 'dart:mirrors';
 import './ItemCreatorType.dart';
 import './Activator.dart';
+import './AjaxDriver.dart';
 
 class ObjectManager<T extends Model> {
   T? original;
@@ -95,6 +96,65 @@ class ObjectManager<T extends Model> {
 
   String get object_url {
     return '/${this.model_name}/${this.original!.id}';
+  }
+
+  // void print_names<T extends Model>(T model) {
+  //   InstanceMirror model_instance = reflect(model);
+  //   ClassMirror cm = model_instance.type;
+
+  //   for (var attribute in cm.declarations.values) {
+  //     if (attribute is VariableMirror) {
+  //       var attributeName = MirrorSystem.getName(attribute.simpleName);
+  //       print('key: ${attributeName} value: ${model_instance.getField(Symbol(attributeName))}');
+  //     }
+  //   }
+  // }
+  
+  Future delete() async {
+    return httpDriverImpl.request_void('DELETE', this.object_url, {});
+  }
+
+  Future refresh() async {
+    var model = await httpDriverImpl.request_decode(this.creator, 'GET', this.object_url, data: {});
+    this.original = model;
+    this.updated = model;
+  }
+
+  Future save() async {
+    const to_send = const {};
+
+    // for searching _properties of this.updated
+    this.updated!.properties.forEach((key, val) => {
+      if (val != this.original!.properties[key]) {to_send[key] = val}
+    });
+
+    InstanceMirror updated_instance = reflect(this.updated);
+    InstanceMirror original_instance = reflect(this.original);
+
+    // searching actual member variables of updated
+    ClassMirror cm = updated_instance.type;
+    for (var attribute in cm.declarations.values) {
+      if (attribute is VariableMirror) {
+        String attributeName = MirrorSystem.getName(attribute.simpleName);
+        var a = updated_instance.getField(Symbol(attributeName)).reflectee;
+        var b = original_instance.getField(Symbol(attributeName)).reflectee;
+        if (a != b) {
+          to_send[attributeName] = a;
+        }
+      }
+    }
+
+    var model = await httpDriverImpl.request_decode(this.creator, 'PATCH', this.object_url, data: to_send);
+
+    this.original = model;
+    this.updated = model;
+  }
+
+  Future<ObjectManager<T>> update(data) async {
+    var model = await httpDriverImpl.request_decode(this.creator, 'PATCH', this.object_url, data: data);
+    this.original = model;
+    this.updated = model;
+    return this;
   }
 
   Model get model {
