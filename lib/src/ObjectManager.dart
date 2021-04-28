@@ -57,7 +57,6 @@ class ObjectManager<T extends Model> {
           }
         }
         return null;
-        // return _properties[realName];
       }
     }
     return super.noSuchMethod(invocation);
@@ -105,11 +104,6 @@ class ObjectManager<T extends Model> {
 
   Future save() async {
     const to_send = const {};
-
-    // for searching _properties of this.updated
-    // this.updated!.properties.forEach((key, val) => {
-    //   if (val != this.original!.properties[key]) {to_send[key] = val}
-    // });
 
     InstanceMirror updated_instance = reflect(this.updated);
     InstanceMirror original_instance = reflect(this.original);

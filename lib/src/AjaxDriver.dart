@@ -101,10 +101,40 @@ class HttpDriverImpl implements HttpDriver {
 
   Future request(String method, String url, data) async {
     var current_request_id = REQUEST_ID++;
+    
     url = this.url_prefix + url;
     try {
       Uri uri;
-      if (method == "GET") uri = new Uri(scheme: 'http', host: 'localhost:8080', path: url, queryParameters: data);
+      if (method == "GET") {
+        var filler_val;
+        Map<String, dynamic> new_obj = {};
+        String curr_type;
+        List<String> filler_list;
+        String new_key;
+          
+        data.forEach((key, val) => {
+          curr_type = val.runtimeType.toString(),
+          if (curr_type.length < 4 || curr_type.substring(0, 4) != "List") {
+            filler_val = val,
+            if (val.runtimeType.toString() != "String") {
+                filler_val = val.toString(),
+            },
+            new_obj[key] = filler_val
+          } else {
+            filler_list = [],
+            val = val as List,
+            for (int i = 0; i < val.length; i++) {
+              if (val[i].runtimeType.toString() != "String") {
+                filler_list.add(val[i].toString()),
+              } else filler_list.add(val[i])
+            },
+            new_key = key + '[]',
+            new_obj[new_key] = filler_list,
+          }
+        });
+
+        uri = new Uri(scheme: 'http', host: 'localhost:8080', path: url, queryParameters: new_obj);
+      }
       else uri = new Uri(scheme: 'http', host: 'localhost:8080', path: url);
       print(uri);
 
