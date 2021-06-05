@@ -4,3 +4,6 @@ export 'src/ItemCreatorType.dart';
 export 'src/Model.dart';
 export 'src/ObjectManager.dart';
 export 'src/PageResult.dart';
+export 'src/RelatedObjectManager.dart';
+export 'src/RelatedCollectionManager.dart';
+export 'src/AjaxDriver.dart';

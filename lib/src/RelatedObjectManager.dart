@@ -1,7 +1,6 @@
 import './AjaxDriver.dart';
 import './Model.dart';
 import './ItemCreatorType.dart';
-import 'dart:mirrors';
 import './ObjectManager.dart';
 
 class RelatedObjectManager<T extends Model, P extends Model> {
@@ -12,8 +11,7 @@ class RelatedObjectManager<T extends Model, P extends Model> {
 
   RelatedObjectManager(ItemCreator<T> this.creator, P parent, String this.parent_key) {
     this.parent_id = parent.id;
-    InstanceMirror parent_mirror = reflect(parent);
-    this.parent_model_name = parent_mirror.type.reflectedType.toString().toLowerCase();
+    this.parent_model_name = P.toString().toLowerCase();
   }
 
   String get object_url {
@@ -31,8 +29,9 @@ class RelatedObjectManager<T extends Model, P extends Model> {
   }
 
   Future set(T val) async {
-    return httpDriverImpl.request_void('PATCH', this.object_url, {
-      [this.parent_key]: val.id
-    });
+    // Map<String, dynamic> data = {};
+    // data[this.parent_key!] = val.id;
+    int? data = val.id;
+    return httpDriverImpl.request_void('PATCH', this.object_url, data);
   }
 }

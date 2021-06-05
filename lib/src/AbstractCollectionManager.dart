@@ -10,17 +10,26 @@ abstract class AbstractCollectionManager<T extends Model> {
   String get collection_url;
   ItemCreator<T> get creator;
 
-  Future<PageResult<T>> page(obj) async {
-    var query = {}; 
-    var page = {};
+  Future<PageResult<T>> page(Map<String, dynamic> obj) async {
+    Map<String, dynamic> query = {}; 
+    Map<String, dynamic> page = {};
     if (obj.containsKey('query')) {
-      query = obj.query;
+      query = obj['query'] as Map<String, dynamic>;
     }
     if (obj.containsKey('page')) {
-      page = obj.page;
+      page = obj['page'] as Map<String, dynamic>;
     }
 
-    var to_send = query;
+    
+    Map<String, dynamic> to_send = Map<String, dynamic>();
+    query.forEach((key, val) => {
+      if (val == null) {
+        key += '__isnull',
+        val = true
+      },
+      to_send[key] = val
+    });
+
     page.forEach((key, val) => {
       to_send['_${key}'] = page[key]
     });
@@ -28,8 +37,8 @@ abstract class AbstractCollectionManager<T extends Model> {
     return httpDriverImpl.request_decode_page(this.creator, "GET", this.collection_url, to_send);
   }
 
-  Future<ObjectManager<T>> get(query) async {
-    var page = await this.page({ 'query': query, 'page': { 'limit': 2 }});
+  Future<ObjectManager<T>> get(Map<String, dynamic> query) async {
+    PageResult<T> page = await this.page({ 'query': query, 'page': { 'limit': 2 }});
     if (page.total != 1) {
       throw CustomException('.get() must receive exactly 1 object, but got ${page.total}');
     }

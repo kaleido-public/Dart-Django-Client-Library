@@ -6,7 +6,7 @@ import './AjaxDriver.dart';
 import './PageResult.dart';
 import './CustomException.dart';
 
-class CollectionManager<T extends Model> extends AbstractCollectionManager {
+class CollectionManager<T extends Model> extends AbstractCollectionManager<T> {
   ItemCreator<T> creator;
 
   CollectionManager(ItemCreator<T> this.creator) {}
@@ -21,14 +21,18 @@ class CollectionManager<T extends Model> extends AbstractCollectionManager {
   }
 
   Future<ObjectManager<T>> get_or_create(obj) async {
-    var query = {}, defaults = {};
-    if (obj.containsKey('query')) query = obj.query;
-    if (obj.containsKey('defaults')) defaults = obj.defaults;
+    Map<String, dynamic> query = {}; 
+    Map<String, dynamic> defaults = {};
+    if (obj.containsKey('query')) {
+      query = obj['query'] as Map<String, dynamic>;
+    }
+    if (obj.containsKey('page')) {
+      defaults = obj['defaults'] as Map<String, dynamic>;
+    }
 
     PageResult<T> page = await this.page({ 'query': query, 'page': { 'limit': 2 }}) as PageResult<T>;
     if (page.total == 0) {
-      var create_input_obj = {...query, ...defaults};
-      return this.create(create_input_obj);
+      return this.create({...defaults, ...query});
     } else if (page.total == 1) {
       return new ObjectManager<T>(page.objects[0]);
     } else {
@@ -37,17 +41,21 @@ class CollectionManager<T extends Model> extends AbstractCollectionManager {
   }
 
   Future<ObjectManager<T>> update_or_create(obj) async {
-    var query = {}, defaults = {};
-    if (obj.containsKey('query')) query = obj.query;
-    if (obj.containsKey('defaults')) defaults = obj.defaults;
+    Map<String, dynamic> query = {}; 
+    Map<String, dynamic> defaults = {};
+    if (obj.containsKey('query')) {
+      query = obj['query'] as Map<String, dynamic>;
+    }
+    if (obj.containsKey('defaults')) {
+      defaults = obj['defaults'] as Map<String, dynamic>;
+    }
 
     PageResult<T> page = await this.page({ 'query': query, 'page': { 'limit': 2 }}) as PageResult<T>;
     if (page.total == 0) {
-      return this.create({...query, ...defaults});
+      return this.create({...defaults, ...query});
     } else if (page.total == 1) {
       var manager = new ObjectManager<T>(page.objects[0]);
-      manager.update(defaults);
-      return manager;
+      return manager.update(defaults);
     } else {
       throw CustomException('.get() must receive exactly 1 object, but got ${page.total}');
     }

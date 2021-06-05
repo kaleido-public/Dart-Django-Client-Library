@@ -1,7 +1,6 @@
 import './Model.dart';
 import './ItemCreatorType.dart';
 import './AbstractCollectionManager.dart';
-import 'dart:mirrors';
 import './AjaxDriver.dart';
 
 class RelatedCollectionManager <T extends Model, P extends Model> extends AbstractCollectionManager<T> {
@@ -12,8 +11,7 @@ class RelatedCollectionManager <T extends Model, P extends Model> extends Abstra
   
   RelatedCollectionManager(ItemCreator<T> this.creator, P parent, String this.parent_key) {
     this.parent_id = parent.id;
-    InstanceMirror parent_mirror = reflect(parent);
-    this.parent_model_name = parent_mirror.type.reflectedType.toString().toLowerCase();
+    this.parent_model_name = P.toString().toLowerCase();
   }
 
   String get collection_url {
@@ -25,7 +23,7 @@ class RelatedCollectionManager <T extends Model, P extends Model> extends Abstra
   }
 
   Future set_ids(List<int> ids) async {
-    return httpDriverImpl.request_void('PUT', this.collection_url, ids);
+    return httpDriverImpl.request_void('PATCH', this.collection_url, ids);
   }
 
   Future remove_ids(List<int> ids) async {
@@ -37,7 +35,7 @@ class RelatedCollectionManager <T extends Model, P extends Model> extends Abstra
   }
 
   Future set (List<T> objects) async {
-    return httpDriverImpl.request_void('PUT', this.collection_url, objects.map((val) => val.id).toList());
+    return httpDriverImpl.request_void('PATCH', this.collection_url, objects.map((val) => val.id).toList());
   }
 
   Future remove(List<T> objects) async {

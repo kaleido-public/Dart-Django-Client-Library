@@ -1,5 +1,6 @@
-import 'dart:mirrors';
-
 abstract class Model {
-  abstract int id;
+  int? get id;
+  Model clone();
+  Map<String, Object?> properties = {};
+  Model fromJson(dynamic obj);
 }
