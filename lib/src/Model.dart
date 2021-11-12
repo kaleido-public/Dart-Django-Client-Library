@@ -1,6 +1,9 @@
 abstract class Model {
-  int? get id;
+  dynamic get id;
+  var props = Map<String, dynamic>();
   Model clone();
-  Map<String, Object?> properties = {};
-  Model fromJson(dynamic obj);
 }
+
+// obj.props.key //
+// obj.updateProps.key = 2 // new
+// obj.updated.({"key", 2})

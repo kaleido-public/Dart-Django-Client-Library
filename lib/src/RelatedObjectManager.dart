@@ -1,15 +1,16 @@
-import './AjaxDriver.dart';
-import './Model.dart';
-import './ItemCreatorType.dart';
-import './ObjectManager.dart';
+import 'AjaxDriver.dart';
+import 'Model.dart';
+import 'types.dart';
+import 'ObjectManager.dart';
 
 class RelatedObjectManager<T extends Model, P extends Model> {
-  int? parent_id;
+  dynamic parent_id;
   String? parent_key;
   String? parent_model_name;
-  ItemCreator<T> creator;
+  Constructor<T> creator;
 
-  RelatedObjectManager(ItemCreator<T> this.creator, P parent, String this.parent_key) {
+  RelatedObjectManager(
+      Constructor<T> this.creator, P parent, String this.parent_key) {
     this.parent_id = parent.id;
     this.parent_model_name = P.toString().toLowerCase();
   }
@@ -20,7 +21,8 @@ class RelatedObjectManager<T extends Model, P extends Model> {
 
   Future<ObjectManager<T>> get() async {
     try {
-      var model = await httpDriverImpl.request_decode(this.creator, 'GET', this.object_url);
+      var model =
+          await Ajax.request_decode(this.creator, 'GET', this.object_url);
       return new ObjectManager<T>(model);
     } catch (error) {
       // TODO: handle case where error is 404: how to get code?
@@ -32,6 +34,6 @@ class RelatedObjectManager<T extends Model, P extends Model> {
     // Map<String, dynamic> data = {};
     // data[this.parent_key!] = val.id;
     int? data = val.id;
-    return httpDriverImpl.request_void('PATCH', this.object_url, data);
+    return Ajax.request_void('PATCH', this.object_url, data);
   }
 }

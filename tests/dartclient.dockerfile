@@ -1,0 +1,8 @@
+FROM dart
+ARG PACKAGE_FILE
+
+COPY . /tests
+
+WORKDIR /tests
+COPY ${PACKAGE_FILE} /${PACKAGE_FILE}
+RUN npm install /${PACKAGE_FILE}
