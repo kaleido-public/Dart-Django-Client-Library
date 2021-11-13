@@ -10,6 +10,10 @@ class RetriableError extends DCFError {}
 class ProgrammingError extends DCFError {
   String message;
   ProgrammingError(this.message);
+  @override
+  String toString() {
+    return "ProgrammingError: " + this.message;
+  }
 }
 
 class ResourceError extends DCFError {}
@@ -27,17 +31,17 @@ class InvalidInput extends InputError {
   InvalidInput(this.fields, this.general);
 }
 
-class TemporaryNetworkFailure extends RetriableError {
+class NetworkError extends RetriableError {
   /** The error is likely due to a temporary network failure. The user should try the action again. */
 }
 
 class Throttled extends RetriableError {}
 
-DCFError deduceError(int httpStatusCode, Map<String, dynamic> backendResponse) {
+DCFError deduceError(int httpStatusCode, Map<String, Object> backendResponse) {
   if (backendResponse.containsKey("message") &&
       backendResponse.containsKey("code")) {
-    final code = backendResponse["code"];
-    final message = backendResponse["message"];
+    final code = backendResponse["code"] as String;
+    final message = backendResponse["message"] as String;
     switch (code) {
       case "not_found":
         return NotFound();
@@ -47,19 +51,20 @@ DCFError deduceError(int httpStatusCode, Map<String, dynamic> backendResponse) {
         return ProgrammingError(message);
     }
   } else if (httpStatusCode == 400) {
-    final invalidFields = Map<String, List<String>>();
-    final missingFields = new Set<String>();
+    final invalidFields = <String, List<String>>{};
+    final missingFields = <String>{};
     for (final entry in backendResponse.entries) {
       final field = entry.key;
-      final validationErrors = entry.value;
-      for (final error in validationErrors.entries) {
-        final code = error["code"];
-        final message = error["message"];
+      var validationErrors = entry.value as List<dynamic>;
+      for (final error in validationErrors) {
+        final code = error["code"] as String;
+        final message = error["message"] as String;
         switch (code) {
           case "required":
             missingFields.add(field);
             break;
           case "invalid":
+          case "null":
           case "does_not_exist":
           default:
             var messages = invalidFields[field] ?? [];
@@ -70,12 +75,12 @@ DCFError deduceError(int httpStatusCode, Map<String, dynamic> backendResponse) {
       }
     }
     if (missingFields.isNotEmpty) {
-      return new MissingInput(missingFields);
+      return MissingInput(missingFields);
     }
     if (invalidFields.isNotEmpty) {
-      return new InvalidInput(invalidFields, []);
+      return InvalidInput(invalidFields, []);
     }
   }
   // We are not expecting an unknown error
-  return new ProgrammingError(backendResponse.toString());
+  return ProgrammingError(backendResponse.toString());
 }

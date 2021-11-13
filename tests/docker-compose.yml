@@ -3,9 +3,7 @@ services:
   test:
     build:
       context: ..
-      dockerfile: tests/tsclient.dockerfile
-      args:
-        PACKAGE_FILE: ${PACKAGE_FILE}
+      dockerfile: tests/dart-client.dockerfile
     volumes:
       - ./coverage:/coverage # where the coverage data is outputed
   server:

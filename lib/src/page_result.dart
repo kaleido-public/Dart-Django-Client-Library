@@ -1,5 +1,5 @@
-import 'Model.dart';
-import 'ObjectManager.dart';
+import 'model.dart';
+import 'object_manager.dart';
 
 class PageResult<T extends Model> {
   int? page = 0;
@@ -10,7 +10,7 @@ class PageResult<T extends Model> {
   String? next = "";
   List<T> objects = [];
 
-  List<ObjectManager<T>> get managers {
-    return this.objects.map((val) => new ObjectManager(val)).toList();
+  Iterable<ObjectManager<T>> get managers {
+    return this.objects.map((val) => ObjectManager(val));
   }
 }
