@@ -32,10 +32,6 @@ jobs:
           .github/workflows/set_env.py
           .github/workflows/set_env.py -w
 
-      - name: Install workflow
-        run: |
-          sudo -E .github/workflows/installation.py
-
       - name: Create PR
         if: env.IS_DEV_BRANCH == 'True' || env.BRANCH_NAME == 'staging'
         run: |
@@ -45,6 +41,10 @@ jobs:
             --base ${TARGET_BRANCH} \
             --title "${TARGET_BRANCH} <- ${BRANCH_NAME}: ${COMMIT_TITLE}" \
             --body "${PR_BODY}" <<< ${{ github.token }}
+
+      - name: Install workflow
+        run: |
+          sudo -E .github/workflows/installation.py
 
       - name: Run style check
         run: |
