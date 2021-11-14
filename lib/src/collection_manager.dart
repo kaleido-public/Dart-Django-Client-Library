@@ -27,7 +27,7 @@ class CollectionManager<T extends Model> extends AbstractCollectionManager<T> {
     return ObjectManager<T>(object);
   }
 
-  Future<ObjectManager<T>> get_or_create({
+  Future<ObjectManager<T>> getOrCreate({
     Map<String, Object?> query = const {},
     Map<String, Object?> defaults = const {},
   }) async {
@@ -43,7 +43,7 @@ class CollectionManager<T extends Model> extends AbstractCollectionManager<T> {
     }
   }
 
-  Future<ObjectManager<T>> update_or_create({
+  Future<ObjectManager<T>> updateOrCreate({
     Map<String, Object?> query = const {},
     Map<String, Object> defaults = const {},
   }) async {
