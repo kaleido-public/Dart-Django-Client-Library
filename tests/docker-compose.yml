@@ -1,0 +1,16 @@
+version: "3"
+services:
+  test:
+    build:
+      context: ..
+      dockerfile: tests/dart-client.dockerfile
+    volumes:
+      - ./coverage:/coverage # where the coverage data is outputed
+  server:
+    build:
+      context: .
+      dockerfile: ./server.dockerfile
+      args:
+        DCF_BRANCH: "staging"
+    ports:
+      - 8001:8000

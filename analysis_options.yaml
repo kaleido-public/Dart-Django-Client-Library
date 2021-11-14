@@ -1,0 +1,27 @@
+include: package:lints/recommended.yaml
+
+analyzer:
+  exclude: [build/**]
+  language:
+    strict-raw-types: true
+  # strong-mode:
+  #   implicit-casts: false
+  errors:
+    dead_code: warning
+    unused_element: info
+    unused_import: info
+    unused_local_variable: info
+    curly_braces_in_flow_control_structures: error
+    annotate_overrides: error
+    strict_raw_type: error
+    prefer_typing_uninitialized_variables: error
+    unawaited_futures: error
+    hash_and_equals: error
+linter:
+  rules:
+    # disables
+    unnecessary_this: false
+    unnecessary_brace_in_string_interps: false
+    non_constant_identifier_names: false
+    # enables
+    unawaited_futures: true
