@@ -46,11 +46,6 @@ jobs:
             --title "${TARGET_BRANCH} <- ${BRANCH_NAME}: ${COMMIT_TITLE}" \
             --body "${PR_BODY}" <<< ${{ github.token }}
 
-      - name: Bump version and create PRs
-        if: env.BRANCH_NAME == 'staging'
-        run: |
-          .github/workflows/bump_version.py -m --push <<< ${{ github.token }}
-
       - name: Run style check
         run: |
           dart pub get
