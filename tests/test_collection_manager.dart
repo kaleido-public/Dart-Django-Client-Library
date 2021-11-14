@@ -241,7 +241,7 @@ void main() {
   });
 
   test('test get or create', () async {
-    var om = await Product.objects.get_or_create(
+    var om = await Product.objects.getOrCreate(
       query: {"barcode": "product 1"},
       defaults: {"brand_id": null},
     );
@@ -249,7 +249,7 @@ void main() {
   });
 
   test('test get or create v2', () async {
-    var om = await Product.objects.get_or_create(
+    var om = await Product.objects.getOrCreate(
       query: {"barcode": "product 1"},
     );
     expect(om.props.barcode, "product 1");
@@ -258,7 +258,7 @@ void main() {
   test('test get or create v3', () async {
     await Product.objects.create({"barcode": "product 1"});
     await Product.objects.create({"barcode": "product 2"});
-    var om = await Product.objects.get_or_create(
+    var om = await Product.objects.getOrCreate(
       query: {"barcode": "product 2"},
       defaults: {"brand_id": null},
     );
@@ -266,7 +266,7 @@ void main() {
   });
 
   test('test update or create', () async {
-    var om = await Product.objects.update_or_create(
+    var om = await Product.objects.updateOrCreate(
       query: {"barcode": "product 2"},
       defaults: {"barcode": "product 3"},
     );
@@ -275,7 +275,7 @@ void main() {
 
   test('test update or create v2', () async {
     await Product.objects.create({"barcode": "product 2"});
-    var om = await Product.objects.update_or_create(
+    var om = await Product.objects.updateOrCreate(
       query: {"barcode": "product 2"},
       defaults: {"barcode": "product 3"},
     );
