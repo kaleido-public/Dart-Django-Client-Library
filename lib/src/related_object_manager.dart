@@ -20,7 +20,7 @@ class RelatedObjectManager<T extends Model, P extends Model> {
   }
 
   String get objectUrl {
-    return '/${this.parent_model_name}/${this.parent_id}/${this.parent_key}';
+    return '${this.parent_model_name}/${this.parent_id}/${this.parent_key}';
   }
 
   Future<ObjectManager<T>?> get() async {

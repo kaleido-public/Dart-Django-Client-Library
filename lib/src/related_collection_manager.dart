@@ -18,7 +18,7 @@ class RelatedCollectionManager<T extends Model, P extends Model>
 
   @override
   String get collectionUrl {
-    return '/${this.parent_model_name}/${this.parent_id}/${this.parent_key}';
+    return '${this.parent_model_name}/${this.parent_id}/${this.parent_key}';
   }
 
   Future<void> addIDs(Iterable<Object> ids) async {

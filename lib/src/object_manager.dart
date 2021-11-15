@@ -26,7 +26,7 @@ class ObjectManager<T extends Model> {
   }
 
   String get objectUrl {
-    return '/${this.modelName}/${this._original.id}';
+    return '${this.modelName}/${this._original.id}';
   }
 
   Future<void> delete() async {
