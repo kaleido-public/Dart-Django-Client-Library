@@ -1,4 +1,4 @@
-import 'package:django_client_framework/main.dart';
+import 'package:django_client_framework/django_client_framework.dart';
 import 'package:logging/logging.dart' as logging;
 import 'package:test/test.dart';
 
