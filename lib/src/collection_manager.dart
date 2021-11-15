@@ -14,7 +14,7 @@ class CollectionManager<T extends Model> extends AbstractCollectionManager<T> {
 
   @override
   String get collectionUrl {
-    return "/${T.toString().toLowerCase()}";
+    return "${T.toString().toLowerCase()}";
   }
 
   Future<ObjectManager<T>> create(Map<String, Object?> data) async {

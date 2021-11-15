@@ -21,8 +21,8 @@ class APIEndpoint {
   int port;
   APIEndpoint({
     this.scheme = "https",
-    this.urlPrefix = "",
-    this.host = "",
+    this.urlPrefix = "/",
+    this.host = "localhost",
     this.port = 443,
   });
 
