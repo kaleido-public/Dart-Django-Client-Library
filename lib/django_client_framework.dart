@@ -1,10 +1,10 @@
 export 'src/abstract_collection_manager.dart';
+export 'src/ajax_driver.dart';
 export 'src/collection_manager.dart';
-export './src/types.dart';
+export 'src/errors.dart';
 export 'src/model.dart';
 export 'src/object_manager.dart';
 export 'src/page_result.dart';
-export 'src/related_object_manager.dart';
 export 'src/related_collection_manager.dart';
-export 'src/ajax_driver.dart';
-export './src/errors.dart';
+export 'src/related_object_manager.dart';
+export 'src/types.dart';
