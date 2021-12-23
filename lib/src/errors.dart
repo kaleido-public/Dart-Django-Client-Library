@@ -18,6 +18,12 @@ class ProgrammingError extends DCFError {
 
 class ResourceError extends DCFError {}
 
+class BadToken extends DCFError {}
+
+class PermissionDenied extends BadToken {}
+
+class InvalidToken extends BadToken {}
+
 class NotFound extends ResourceError {}
 
 class MissingInput extends InputError {
@@ -47,6 +53,10 @@ DCFError deduceError(int httpStatusCode, Map<String, Object> backendResponse) {
         return NotFound();
       case "throttled":
         return Throttled();
+      case "permission_denied":
+        return PermissionDenied();
+      case "authentication_failed":
+        return InvalidToken();
       default:
         return ProgrammingError(message);
     }
