@@ -2,17 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:logging/logging.dart';
+import 'package:logger/logger.dart';
 
 import 'errors.dart';
 import 'json_decoder.dart' as decoder;
 import 'model.dart';
 import 'page_result.dart';
 import 'types.dart';
-
-var REQUEST_ID = 0;
-final log = Logger('AjaxDriver');
-final AjaxDriverLogger = log;
 
 class APIEndpoint {
   String scheme;
@@ -74,10 +70,13 @@ abstract class AjaxDriver {
 
   Future<void> requestVoid(String method, String url, data);
 
+  void enableDefaultLogger();
+
   Map<String, String> additionalHeaders = {};
   abstract String authToken;
   List<APIEndpoint> endpoints = [];
   APIEndpoint? preferredEndpoint;
+  Logger? logger;
 }
 
 class AjaxDriverImpl implements AjaxDriver {
@@ -89,6 +88,9 @@ class AjaxDriverImpl implements AjaxDriver {
   APIEndpoint? preferredEndpoint;
   @override
   Map<String, String> additionalHeaders = {};
+  static var REQUEST_ID = 0;
+  @override
+  Logger? logger;
 
   get headers {
     Map<String, String> headers = <String, String>{};
@@ -113,7 +115,7 @@ class AjaxDriverImpl implements AjaxDriver {
         );
       }
     } on NetworkError {
-      AjaxDriverLogger.warning("Endpoint failure: ${this.preferredEndpoint}");
+      logger?.w("Endpoint failure: ${this.preferredEndpoint}");
     }
     // if the preferredEndpoint succeeds, the code returns early.
     for (var endpoint in this.endpoints) {
@@ -122,11 +124,11 @@ class AjaxDriverImpl implements AjaxDriver {
         this.preferredEndpoint = endpoint;
         return response;
       } on NetworkError {
-        AjaxDriverLogger.warning("Endpoint failure: ${endpoint}");
+        logger?.w("Endpoint failure: ${endpoint}");
         continue;
       }
     }
-    AjaxDriverLogger.severe("Have tried all endpoints.");
+    logger?.e("Have tried all endpoints.");
     throw NetworkError();
   }
 
@@ -149,7 +151,7 @@ class AjaxDriverImpl implements AjaxDriver {
     String sendLog =
         "AjaxDriver sent (#${currentRequestID}) ${method} ${uri} ${encoded}";
 
-    log.finer(sendLog);
+    logger?.d(sendLog);
 
     try {
       switch (method) {
@@ -194,11 +196,11 @@ class AjaxDriverImpl implements AjaxDriver {
     String receiveLog =
         "AjaxDriver received (#${currentRequestID}) ${response.statusCode} ${response.reasonPhrase} ${response.body}";
     if (200 <= response.statusCode && response.statusCode < 300) {
-      log.finer(receiveLog);
+      logger?.d(receiveLog);
       return response.body;
     } else {
-      log.warning(sendLog);
-      log.warning(receiveLog);
+      logger?.w(sendLog);
+      logger?.w(receiveLog);
       throw deduceError(
           response.statusCode, Map.from(jsonDecode(response.body)));
     }
@@ -256,6 +258,22 @@ class AjaxDriverImpl implements AjaxDriver {
   Future<void> requestVoid(String method, String url, data) async {
     await this.request(method, url, data);
   }
+
+  static Logger? defaultLogger = Logger(
+    printer: PrettyPrinter(
+      colors: true,
+      methodCount: 0,
+      errorMethodCount: 8,
+      printEmojis: true,
+      printTime: false,
+      lineLength: 120,
+    ),
+  );
+
+  @override
+  enableDefaultLogger() {
+    logger = defaultLogger;
+  }
 }
 
-var ajax = AjaxDriverImpl();
+AjaxDriver ajax = AjaxDriverImpl();
