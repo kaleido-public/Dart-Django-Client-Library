@@ -1,16 +1,10 @@
 import 'package:django_client_framework/django_client_framework.dart';
-import 'package:logging/logging.dart' as logging;
 import 'package:test/test.dart';
 
 import 'models.dart';
 
 void main() {
-  logging.hierarchicalLoggingEnabled = true;
-  AjaxDriverLogger.level = logging.Level.WARNING;
-  logging.Logger.root.onRecord.listen((record) {
-    print('${record.level.name}: ${record.time}: ${record.message}');
-  });
-
+  ajax.enableDefaultLogger();
   ajax.endpoints = [
     APIEndpoint(scheme: "http", host: "server", urlPrefix: "", port: 8000),
     APIEndpoint(scheme: "http", host: "localhost", urlPrefix: "", port: 8001),
