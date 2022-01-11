@@ -61,26 +61,45 @@ DCFError deduceError(int httpStatusCode, Map<String, Object> backendResponse) {
         return ProgrammingError(message);
     }
   } else if (httpStatusCode == 400) {
+    // The client expects a error message matching the schema
+    // {
+    //    "<field_name>": [
+    //        {
+    //            "code": "<code>",
+    //            "message": "<message>"
+    //        }
+    //    ],
+    //    "general_errors": ["<message>"] // an error not specific to a field
+    // }
     final invalidFields = <String, List<String>>{};
     final missingFields = <String>{};
+    final generalErrors = <String>[];
     for (final entry in backendResponse.entries) {
-      final field = entry.key;
-      var validationErrors = entry.value as List<dynamic>;
-      for (final error in validationErrors) {
-        final code = error["code"] as String;
-        final message = error["message"] as String;
-        switch (code) {
-          case "required":
-            missingFields.add(field);
-            break;
-          case "invalid":
-          case "null":
-          case "does_not_exist":
-          default:
-            var messages = invalidFields[field] ?? [];
-            messages.add(message);
-            invalidFields[field] = messages;
-            break;
+      if (entry.key == "general_errors") {
+        generalErrors.addAll(
+          (entry.value as List<dynamic>).map(
+            (e) => e as String,
+          ),
+        );
+      } else {
+        final field = entry.key;
+        var validationErrors = entry.value as List<dynamic>;
+        for (final error in validationErrors) {
+          final code = error["code"] as String;
+          final message = error["message"] as String;
+          switch (code) {
+            case "required":
+              missingFields.add(field);
+              break;
+            case "invalid":
+            case "null":
+            case "does_not_exist":
+            default:
+              var messages = invalidFields[field] ?? [];
+              messages.add(message);
+              invalidFields[field] = messages;
+              break;
+          }
         }
       }
     }
@@ -88,7 +107,7 @@ DCFError deduceError(int httpStatusCode, Map<String, Object> backendResponse) {
       return MissingInput(missingFields);
     }
     if (invalidFields.isNotEmpty) {
-      return InvalidInput(invalidFields, []);
+      return InvalidInput(invalidFields, generalErrors);
     }
   }
   // We are not expecting an unknown error
