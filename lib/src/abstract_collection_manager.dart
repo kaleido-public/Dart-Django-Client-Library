@@ -49,7 +49,7 @@ abstract class AbstractCollectionManager<T extends Model> {
       limit: 2,
     );
     if (page.objects_count != 1) {
-      throw ProgrammingError(
+      throw APIProgrammingError(
         '.get() must receive exactly 1 object, but got ${page.objects_count}',
       );
     }
