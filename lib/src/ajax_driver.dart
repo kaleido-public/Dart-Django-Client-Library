@@ -58,15 +58,25 @@ abstract class AjaxDriver {
   Future<void> request(String method, String url, data);
 
   Future<T> requestDecode<T extends Model>(
-      Constructor<T> creator, String method, String url,
-      {data = const {}});
+    Constructor<T> creator,
+    String method,
+    String url, {
+    data = const {},
+  });
 
   Future<T> requestDecodeFromModel<T extends Model>(
-      T model, String method, String url,
-      {data = const {}});
+    T model,
+    String method,
+    String url, {
+    data = const {},
+  });
 
   Future<PageResult<T>> requestDecodePage<T extends Model>(
-      Constructor<T> creator, String method, String url, data);
+    Constructor<T> creator,
+    String method,
+    String url,
+    data,
+  );
 
   Future<void> requestVoid(String method, String url, data);
 
@@ -114,7 +124,7 @@ class AjaxDriverImpl implements AjaxDriver {
           data,
         );
       }
-    } on NetworkError {
+    } on APINetworkError {
       logger?.w("Endpoint failure: ${this.preferredEndpoint}");
     }
     // if the preferredEndpoint succeeds, the code returns early.
@@ -123,13 +133,13 @@ class AjaxDriverImpl implements AjaxDriver {
         var response = await requestEndpoint(endpoint, method, url, data);
         this.preferredEndpoint = endpoint;
         return response;
-      } on NetworkError {
+      } on APINetworkError {
         logger?.w("Endpoint failure: ${endpoint}");
         continue;
       }
     }
     logger?.e("Have tried all endpoints.");
-    throw NetworkError();
+    throw APINetworkError();
   }
 
   Future<String> requestEndpoint(
@@ -187,10 +197,10 @@ class AjaxDriverImpl implements AjaxDriver {
           );
           break;
         default:
-          throw ProgrammingError("Not supported METHOD: " + method);
+          throw APIProgrammingError("Not supported METHOD: " + method);
       }
     } on SocketException {
-      throw NetworkError();
+      throw APINetworkError();
     }
 
     String receiveLog =

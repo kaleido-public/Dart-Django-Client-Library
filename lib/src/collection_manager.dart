@@ -37,7 +37,7 @@ class CollectionManager<T extends Model> extends AbstractCollectionManager<T> {
     } else if (page.objects_count == 1) {
       return ObjectManager<T>(page.objects[0]);
     } else {
-      throw ProgrammingError(
+      throw APIProgrammingError(
         '.get() must receive exactly one object, but got ${page.objects_count}',
       );
     }
@@ -54,7 +54,7 @@ class CollectionManager<T extends Model> extends AbstractCollectionManager<T> {
       var manager = ObjectManager<T>(page.objects[0]);
       return manager.update(defaults);
     } else {
-      throw ProgrammingError(
+      throw APIProgrammingError(
         '.get() must receive exactly 1 object, but got ${page.objects_count}',
       );
     }

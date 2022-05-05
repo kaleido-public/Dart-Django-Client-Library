@@ -75,7 +75,7 @@ void main() {
 
   test('test get with no result', () async {
     var brand = await Brand.objects.create({"name": "nike"});
-    expect(brand.props.products.get(), throwsA(isA<ProgrammingError>()));
+    expect(brand.props.products.get(), throwsA(isA<APIProgrammingError>()));
   });
 
   test('test get with one result', () async {
@@ -98,7 +98,7 @@ void main() {
     await brand.props.products.add(products);
 
     await brand.refresh();
-    expect(brand.props.products.get(), throwsA(isA<ProgrammingError>()));
+    expect(brand.props.products.get(), throwsA(isA<APIProgrammingError>()));
   });
 
   test('test add objs', () async {

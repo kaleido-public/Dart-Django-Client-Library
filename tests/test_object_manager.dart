@@ -15,7 +15,7 @@ void main() {
   });
 
   test('test get object none should fail', () async {
-    expect(Product.objects.get(), throwsA(isA<ProgrammingError>()));
+    expect(Product.objects.get(), throwsA(isA<APIProgrammingError>()));
   });
 
   test('test refresh', () async {
@@ -68,13 +68,16 @@ void main() {
 
   test('test update bad key', () async {
     var om = await Product.objects.create({"barcode": "product 1"});
-    expect(om.update({"barcodeafaf": "osu!"}), throwsA(isA<InvalidInput>()));
+    expect(
+      om.update({"barcodeafaf": "osu!"}),
+      throwsA(isA<APIValidationError>()),
+    );
   });
 
   test('test delete', () async {
     var product = await Product.objects.create({"barcode": "product 1"});
     await product.delete();
-    expect(product.refresh(), throwsA(isA<ProgrammingError>()));
+    expect(product.refresh(), throwsA(isA<APINotFoundError>()));
   });
 
   test('test modify using properties to blank and null', () async {

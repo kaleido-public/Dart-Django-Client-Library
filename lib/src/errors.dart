@@ -1,47 +1,35 @@
 abstract class DCFError {}
 
-class InputError extends DCFError {
-  /** When you see this error, the user needs to change the input, before
-     * trying the action again. */
-}
+class APIRetriableError extends DCFError {}
 
-class RetriableError extends DCFError {}
-
-class ProgrammingError extends DCFError {
+class APIProgrammingError extends DCFError {
   String message;
-  ProgrammingError(this.message);
+  APIProgrammingError(this.message);
   @override
   String toString() {
-    return "ProgrammingError: " + this.message;
+    return "APIProgrammingError: " + this.message;
   }
 }
 
-class ResourceError extends DCFError {}
+class APITokenError extends DCFError {}
 
-class BadToken extends DCFError {}
+class APIPermissionError extends APITokenError {}
 
-class PermissionDenied extends BadToken {}
+class APIMalformedTokenError extends APITokenError {}
 
-class InvalidToken extends BadToken {}
+class APINotFoundError extends DCFError {}
 
-class NotFound extends ResourceError {}
-
-class MissingInput extends InputError {
-  Set<String> fields;
-  MissingInput(this.fields);
+class APIValidationError extends DCFError {
+  Map<String, String> fields;
+  String non_field;
+  APIValidationError(this.fields, this.non_field);
 }
 
-class InvalidInput extends InputError {
-  Map<String, List<String>> fields;
-  List<String> general;
-  InvalidInput(this.fields, this.general);
-}
-
-class NetworkError extends RetriableError {
+class APINetworkError extends APIRetriableError {
   /** The error is likely due to a temporary network failure. The user should try the action again. */
 }
 
-class Throttled extends RetriableError {}
+class APIThrottledError extends APIRetriableError {}
 
 DCFError deduceError(int httpStatusCode, Map<String, Object> backendResponse) {
   if (backendResponse.containsKey("message") &&
@@ -50,66 +38,23 @@ DCFError deduceError(int httpStatusCode, Map<String, Object> backendResponse) {
     final message = backendResponse["message"] as String;
     switch (code) {
       case "not_found":
-        return NotFound();
+        return APINotFoundError();
       case "throttled":
-        return Throttled();
+        return APIThrottledError();
       case "permission_denied":
-        return PermissionDenied();
+        return APIPermissionError();
       case "authentication_failed":
-        return InvalidToken();
-      default:
-        return ProgrammingError(message);
-    }
-  } else if (httpStatusCode == 400) {
-    // The client expects a error message matching the schema
-    // {
-    //    "<field_name>": [
-    //        {
-    //            "code": "<code>",
-    //            "message": "<message>"
-    //        }
-    //    ],
-    //    "general_errors": ["<message>"] // an error not specific to a field
-    // }
-    final invalidFields = <String, List<String>>{};
-    final missingFields = <String>{};
-    final generalErrors = <String>[];
-    for (final entry in backendResponse.entries) {
-      if (entry.key == "general_errors") {
-        generalErrors.addAll(
-          (entry.value as List<dynamic>).map(
-            (e) => e as String,
-          ),
+        return APIMalformedTokenError();
+      case "validation_error":
+        final fields = Map<String, String>.from(
+          backendResponse["fields"] as dynamic,
         );
-      } else {
-        final field = entry.key;
-        var validationErrors = entry.value as List<dynamic>;
-        for (final error in validationErrors) {
-          final code = error["code"] as String;
-          final message = error["message"] as String;
-          switch (code) {
-            case "required":
-              missingFields.add(field);
-              break;
-            case "invalid":
-            case "null":
-            case "does_not_exist":
-            default:
-              var messages = invalidFields[field] ?? [];
-              messages.add(message);
-              invalidFields[field] = messages;
-              break;
-          }
-        }
-      }
-    }
-    if (missingFields.isNotEmpty) {
-      return MissingInput(missingFields);
-    }
-    if (invalidFields.isNotEmpty) {
-      return InvalidInput(invalidFields, generalErrors);
+        final non_field = backendResponse["non_field"] as String;
+        return APIValidationError(fields, non_field);
+      default:
+        return APIProgrammingError(message);
     }
   }
   // We are not expecting an unknown error
-  return ProgrammingError(backendResponse.toString());
+  return APIProgrammingError(backendResponse.toString());
 }
