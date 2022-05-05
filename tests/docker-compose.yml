@@ -11,6 +11,6 @@ services:
       context: .
       dockerfile: ./server.dockerfile
       args:
-        DCF_BRANCH: "staging"
+        DCF_BRANCH: "64f476f"
     ports:
       - 8001:8000

@@ -27,7 +27,7 @@ class RelatedObjectManager<T extends Model, P extends Model> {
     try {
       var model = await ajax.requestDecode(this.creator, 'GET', this.objectUrl);
       return ObjectManager<T>(model);
-    } on NotFound {
+    } on APINotFoundError {
       return null;
     }
   }

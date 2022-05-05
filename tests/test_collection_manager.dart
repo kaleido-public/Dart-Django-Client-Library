@@ -15,7 +15,7 @@ void main() {
   });
 
   test('test get object none should fail', () async {
-    expect(Product.objects.get(), throwsA(isA<ProgrammingError>()));
+    expect(Product.objects.get(), throwsA(isA<APIProgrammingError>()));
   });
 
   test('test get object one should pass', () async {
@@ -27,7 +27,7 @@ void main() {
   test('test get object more than one should fail', () async {
     await Product.objects.create({"barcode": "hello"});
     await Product.objects.create({"barcode": "hello"});
-    expect(Product.objects.get(), throwsA(isA<ProgrammingError>()));
+    expect(Product.objects.get(), throwsA(isA<APIProgrammingError>()));
   });
 
   test('test get object with array params', () async {
@@ -209,7 +209,7 @@ void main() {
         },
         order_by: "-barcode,-id",
       ),
-      throwsA(isA<ProgrammingError>()),
+      throwsA(isA<APIProgrammingError>()),
     );
   });
 
@@ -224,13 +224,14 @@ void main() {
   });
 
   test('test create object with null key should fail ', () async {
-    expect(Brand.objects.create({"name": null}), throwsA(isA<InvalidInput>()));
+    expect(Brand.objects.create({"name": null}),
+        throwsA(isA<APIValidationError>()));
   });
 
   test('test create object with invalid key', () async {
     expect(
       Product.objects.create({"barasdfcode": "hello"}),
-      throwsA(isA<InvalidInput>()),
+      throwsA(isA<APIValidationError>()),
     );
   });
 
