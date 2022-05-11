@@ -243,25 +243,22 @@ class AjaxDriverImpl implements AjaxDriver {
     data,
   ) async {
     var encoded = await this.request(method, url, data);
-    var obj = jsonDecode(encoded);
-    PageResult<T> page = PageResult<T>();
-    page.limit = obj['limit'] as int?;
-    page.page = obj['page'] as int?;
-    page.objects_count = obj['objects_count'] as int;
-    page.pages_count = obj['pages_count'] as int;
-    page.previous = obj['previous'] as String?;
-    page.next = obj['next'] as String?;
-    List<T> page_objects = [];
-    for (Object obj in obj['objects'] as List<dynamic>) {
-      page_objects.add(
-        decoder.jsonDecoder.convertFromDecoded(
-          ctor,
-          obj as Map<String, Object?>,
-        ),
-      );
-    }
-    page.objects = page_objects;
-    return page;
+    var decoded = jsonDecode(encoded);
+    return PageResult<T>(
+      limit: decoded['limit'] as int,
+      page: decoded['page'] as int,
+      objectsCount: decoded['objects_count'] as int,
+      pagesCount: decoded['pages_count'] as int,
+      previous: decoded['previous'] as String?,
+      next: decoded['next'] as String?,
+      objects: [
+        for (Object obj in decoded['objects'] as List<dynamic>)
+          decoder.jsonDecoder.convertFromDecoded(
+            ctor,
+            obj as Map<String, Object?>,
+          )
+      ],
+    );
   }
 
   @override

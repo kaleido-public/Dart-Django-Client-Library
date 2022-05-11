@@ -34,4 +34,45 @@ void main() {
     brand = await pom.props.brand.get();
     expect("nike", brand?.props.name);
   });
+
+  test('test page prefetchRelatedObject (small batchSize)', () async {
+    var brand = await Brand.objects.create({"name": "nike"});
+    await Future.wait([
+      for (var i = 0; i < 25; i++)
+        Product.objects
+            .create({"barcode": "product ${i}", "brand_id": brand.props.id})
+    ]);
+    var productPage = await Product.objects.page();
+    await productPage.prefetchRelatedObject(
+      (p) => p.brand,
+      batchSize: 1,
+      pageSize: 1,
+    );
+    for (var product in productPage.objects) {
+      expect(product.brand.getCached(), isNotNull);
+      expect(product.brand.getCached()!.props.name, "nike");
+      expect(await product.brand.get(), isNotNull);
+    }
+  });
+
+  test('test page prefetchRelatedObject (large batchSize)', () async {
+    var brand = await Brand.objects.create({"name": "nike"});
+    await Future.wait([
+      for (var i = 0; i < 25; i++)
+        Product.objects
+            .create({"barcode": "product ${i}", "brand_id": brand.props.id})
+    ]);
+    var productPage = await Product.objects.page();
+
+    await productPage.prefetchRelatedObject(
+      (p) => p.brand,
+      batchSize: 50,
+      pageSize: 100,
+    );
+    for (var product in productPage.objects) {
+      expect(product.brand.getCached(), isNotNull);
+      expect(product.brand.getCached()!.props.name, "nike");
+      expect(await product.brand.get(), isNotNull);
+    }
+  });
 }

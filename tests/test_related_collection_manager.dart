@@ -20,7 +20,7 @@ void main() {
         await om.props.products.page(query: {"barcode": "product 1"});
     expect(products.limit, 50);
     expect(products.page, 1);
-    expect(products.objects_count, 0);
+    expect(products.objectsCount, 0);
     expect(products.objects.length, 0);
   });
 
@@ -39,11 +39,11 @@ void main() {
       query: {
         "barcode__in": ["product 0", "product 4", "product 9"]
       },
-      order_by: "barcode",
+      orderBy: "barcode",
     );
     expect(products.limit, 50);
     expect(products.page, 1);
-    expect(products.objects_count, 3);
+    expect(products.objectsCount, 3);
     expect(products.objects.length, 3);
     expect(products.objects[0].barcode, "product 0");
   });
@@ -64,11 +64,11 @@ void main() {
     var products = await om.props.products.page(
       limit: 5,
       page: 2,
-      order_by: "-barcode",
+      orderBy: "-barcode",
     );
     expect(products.limit, 5);
     expect(products.page, 2);
-    expect(products.objects_count, 10);
+    expect(products.objectsCount, 10);
     expect(products.objects.length, 5);
     expect(products.objects[0].barcode, "product 4");
   });
@@ -116,16 +116,16 @@ void main() {
 
     await bom.props.products.add(lst1);
     var related = await bom.props.products.page(
-      order_by: "barcode",
+      orderBy: "barcode",
     );
-    expect(5, related.objects_count);
+    expect(5, related.objectsCount);
     expect("sneaker 4", related.objects[4].barcode);
 
     await bom.props.products.add(lst2);
     related = await bom.props.products.page(
-      order_by: "barcode",
+      orderBy: "barcode",
     );
-    expect(10, related.objects_count);
+    expect(10, related.objectsCount);
     expect("sneaker 9", related.objects[9].barcode);
   });
 
@@ -144,16 +144,16 @@ void main() {
 
     await bom.props.products.set(lst1);
     var related = await bom.props.products.page(
-      order_by: "barcode",
+      orderBy: "barcode",
     );
-    expect(9, related.objects_count);
+    expect(9, related.objectsCount);
     expect("sneaker 9", related.objects[8].barcode);
 
     await bom.props.products.set(lst2);
     related = await bom.props.products.page(
-      order_by: "barcode",
+      orderBy: "barcode",
     );
-    expect(1, related.objects_count);
+    expect(1, related.objectsCount);
     expect("sneaker 10", related.objects[0].barcode);
   });
 
@@ -176,15 +176,55 @@ void main() {
 
     await brand.props.products.remove(lst2); // rm 9
     var related = await brand.props.products.page(
-      order_by: "barcode",
+      orderBy: "barcode",
     ); // 0-8
-    expect(9, related.objects_count);
+    expect(9, related.objectsCount);
     expect("sneaker 1", related.objects[0].barcode);
 
     await brand.props.products.remove(lst1);
     related = await brand.props.products.page(
-      order_by: "barcode",
+      orderBy: "barcode",
     );
-    expect(0, related.objects_count);
+    expect(0, related.objectsCount);
+  });
+
+  test('test page prefetchRelatedCollection (small batchSize)', () async {
+    var brand = await Brand.objects.create({"name": "nike"});
+    await Future.wait([
+      for (var i = 0; i < 25; i++)
+        Product.objects
+            .create({"barcode": "product ${i}", "brand_id": brand.props.id})
+    ]);
+    var brandPage = await Brand.objects.page();
+    await brandPage.prefetchRelatedCollection(
+      (b) => b.products,
+      batchSize: 1,
+      pageSize: 1,
+    );
+    for (var brand in brandPage.objects) {
+      expect(brand.products.getCached(), isNotNull);
+      expect(brand.products.getCached()!.length, 25);
+      expect((await brand.products.page()).objects.length, 25);
+    }
+  });
+
+  test('test page prefetchRelatedCollection (large batchSize)', () async {
+    var brand = await Brand.objects.create({"name": "nike"});
+    await Future.wait([
+      for (var i = 0; i < 25; i++)
+        Product.objects
+            .create({"barcode": "product ${i}", "brand_id": brand.props.id})
+    ]);
+    var brandPage = await Brand.objects.page();
+    await brandPage.prefetchRelatedCollection(
+      (b) => b.products,
+      batchSize: 50,
+      pageSize: 100,
+    );
+    for (var brand in brandPage.objects) {
+      expect(brand.products.getCached(), isNotNull);
+      expect(brand.products.getCached()!.length, 25);
+      expect((await brand.products.page()).objects.length, 25);
+    }
   });
 }

@@ -8,9 +8,9 @@ import 'types.dart';
 
 class CollectionManager<T extends Model> extends AbstractCollectionManager<T> {
   @override
-  Constructor<T> ctor;
+  Constructor<T> constructor;
 
-  CollectionManager(this.ctor);
+  CollectionManager(this.constructor);
 
   @override
   String get collectionUrl {
@@ -19,7 +19,7 @@ class CollectionManager<T extends Model> extends AbstractCollectionManager<T> {
 
   Future<ObjectManager<T>> create(Map<String, Object?> data) async {
     var object = await ajax.requestDecode(
-      this.ctor,
+      this.constructor,
       "POST",
       this.collectionUrl,
       data: data,
@@ -32,13 +32,13 @@ class CollectionManager<T extends Model> extends AbstractCollectionManager<T> {
     Map<String, Object?> defaults = const {},
   }) async {
     PageResult<T> page = await this.page(query: query, limit: 2);
-    if (page.objects_count == 0) {
+    if (page.objectsCount == 0) {
       return this.create({...defaults, ...query});
-    } else if (page.objects_count == 1) {
+    } else if (page.objectsCount == 1) {
       return ObjectManager<T>(page.objects[0]);
     } else {
       throw APIProgrammingError(
-        '.get() must receive exactly one object, but got ${page.objects_count}',
+        '.get() must receive exactly one object, but got ${page.objectsCount}',
       );
     }
   }
@@ -48,14 +48,14 @@ class CollectionManager<T extends Model> extends AbstractCollectionManager<T> {
     Map<String, Object> defaults = const {},
   }) async {
     PageResult<T> page = await this.page(query: query, limit: 2);
-    if (page.objects_count == 0) {
+    if (page.objectsCount == 0) {
       return this.create({...defaults, ...query});
-    } else if (page.objects_count == 1) {
+    } else if (page.objectsCount == 1) {
       var manager = ObjectManager<T>(page.objects[0]);
       return manager.update(defaults);
     } else {
       throw APIProgrammingError(
-        '.get() must receive exactly 1 object, but got ${page.objects_count}',
+        '.get() must receive exactly 1 object, but got ${page.objectsCount}',
       );
     }
   }

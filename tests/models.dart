@@ -7,17 +7,19 @@ class Product extends Model {
     this.props = props ?? {};
   }
 
-  @override
-  String get id => props['id'];
-
   String? get barcode => props['barcode'];
   set barcode(String? x) => props['barcode'] = x;
 
   String? get brand_id => props["brand_id"];
   set brand_id(String? x) => props["brand_id"] = x;
 
-  get brand =>
-      RelatedObjectManager<Brand, Product>(() => Brand(), this, "brand");
+  RelatedObjectManager<Brand, Product> get brand => RelatedObjectManager(
+        Brand.new,
+        this,
+        "brand",
+        cache,
+        reverseCollectionManager: (b) => b.products,
+      );
 
   @override
   Model clone() {
@@ -32,14 +34,17 @@ class Brand extends Model {
     this.props = props ?? {};
   }
 
-  @override
-  String get id => props['id'];
-
   String get name => props["name"];
   set name(String x) => props["name"] = x;
 
   RelatedCollectionManager<Product, Brand> get products =>
-      RelatedCollectionManager(() => Product(), this, "products");
+      RelatedCollectionManager(
+        Product.new,
+        this,
+        "products",
+        cache,
+        reverseObjectManager: (p) => p.brand,
+      );
 
   @override
   Model clone() {

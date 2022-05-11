@@ -1,6 +1,11 @@
+import 'package:meta/meta.dart';
+
 abstract class Model {
-  String get id;
+  @nonVirtual
+  String get id => props['id'] ?? "missing id";
+
   Map<String, dynamic> props = {};
+  Map<String, dynamic> cache = {};
   Model clone();
 
   @override
