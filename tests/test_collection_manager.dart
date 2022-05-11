@@ -47,10 +47,10 @@ void main() {
 
   test('test page default', () async {
     var pr = await Product.objects.page(
-      order_by: "barcode",
+      orderBy: "barcode",
     );
     expect(pr.limit, 50);
-    expect(pr.objects_count, 0);
+    expect(pr.objectsCount, 0);
     expect(pr.page, 1);
   });
 
@@ -60,10 +60,10 @@ void main() {
     }
 
     var pr = await Product.objects.page(
-      order_by: "barcode",
+      orderBy: "barcode",
     );
     expect(pr.limit, 50);
-    expect(pr.objects_count, 51);
+    expect(pr.objectsCount, 51);
     expect(pr.page, 1);
   });
 
@@ -78,10 +78,10 @@ void main() {
 
     PageResult<Product> pr = await Product.objects.page(
       query: {'barcode': null},
-      order_by: "barcode",
+      orderBy: "barcode",
     );
     expect(pr.limit, 50);
-    expect(pr.objects_count, 8);
+    expect(pr.objectsCount, 8);
     expect(pr.page, 1);
   });
 
@@ -93,11 +93,11 @@ void main() {
     PageResult<Product> pr = await Product.objects.page(
       page: 2,
       limit: 5,
-      order_by: "barcode",
+      orderBy: "barcode",
     );
     expect(pr.limit, 5);
     expect(pr.page, 2);
-    expect(pr.objects_count, 10);
+    expect(pr.objectsCount, 10);
     expect(pr.objects.length, 5);
     expect(pr.objects[0].barcode, "product 5");
   });
@@ -109,11 +109,11 @@ void main() {
 
     PageResult<Product> pr = await Product.objects.page(
       limit: 5,
-      order_by: "barcode",
+      orderBy: "barcode",
     );
     expect(pr.limit, 5);
     expect(pr.page, 1);
-    expect(pr.objects_count, 10);
+    expect(pr.objectsCount, 10);
     expect(pr.objects.length, 5);
     expect(pr.objects[0].barcode, "product 1");
   });
@@ -127,11 +127,11 @@ void main() {
       query: {
         "barcode__in": ["product 1", "product 3", "product 5"],
       },
-      order_by: "barcode",
+      orderBy: "barcode",
     );
     expect(pr.limit, 50);
     expect(pr.page, 1);
-    expect(pr.objects_count, 3);
+    expect(pr.objectsCount, 3);
     expect(pr.objects.length, 3);
     expect(pr.objects[1].barcode, "product 3");
   });
@@ -147,12 +147,12 @@ void main() {
       },
       limit: 1,
       page: 2,
-      order_by: "barcode",
+      orderBy: "barcode",
     );
     expect(pr.limit, 1);
     expect(pr.page, 2);
-    expect(pr.pages_count, 3);
-    expect(pr.objects_count, 3);
+    expect(pr.pagesCount, 3);
+    expect(pr.objectsCount, 3);
     expect(pr.objects.length, 1);
     expect(pr.objects[0].barcode, "product 3");
   });
@@ -166,11 +166,11 @@ void main() {
       query: {
         "barcode__in": ["shoe 1", "shoe 3", "shoe 5"]
       },
-      order_by: "-barcode",
+      orderBy: "-barcode",
     );
     expect(pr.limit, 50);
     expect(pr.page, 1);
-    expect(pr.objects_count, 3);
+    expect(pr.objectsCount, 3);
     expect(pr.objects.length, 3);
     expect(pr.objects[0].barcode, "shoe 5");
     expect(pr.objects[2].barcode, "shoe 1");
@@ -187,11 +187,11 @@ void main() {
       query: {
         "barcode__in": ["product 1", "product 4", "product 5"]
       },
-      order_by: "-barcode,-id",
+      orderBy: "-barcode,-id",
     );
     expect(pr.limit, 50);
     expect(pr.page, 1);
-    expect(pr.objects_count, 4);
+    expect(pr.objectsCount, 4);
     expect(pr.objects.length, 4);
     expect(pr.objects[0].barcode, "product 5");
     expect(pr.objects[1].barcode, "product 4");
@@ -207,7 +207,7 @@ void main() {
         query: {
           "barcode___in": ["product 1", "product 4", "product 5"]
         },
-        order_by: "-barcode,-id",
+        orderBy: "-barcode,-id",
       ),
       throwsA(isA<APIProgrammingError>()),
     );

@@ -122,7 +122,7 @@ void main() {
       query: {
         'barcode__in': ["pen 1", "pen 2", "pen 3"],
       },
-      order_by: "barcode",
+      orderBy: "barcode",
     );
 
     var objm = ObjectManager<Product>(page.objects[0]);

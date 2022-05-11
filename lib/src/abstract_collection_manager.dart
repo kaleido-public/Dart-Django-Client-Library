@@ -7,12 +7,12 @@ import 'types.dart';
 
 abstract class AbstractCollectionManager<T extends Model> {
   String get collectionUrl;
-  abstract Constructor<T> ctor;
+  abstract Constructor<T> constructor;
 
   Future<PageResult<T>> page({
     Map<String, Object?> query = const {},
     int? page,
-    String? order_by,
+    String? orderBy,
     int? limit,
     String? fulltext,
   }) async {
@@ -25,8 +25,8 @@ abstract class AbstractCollectionManager<T extends Model> {
     if (page != null) {
       to_send["_page"] = page;
     }
-    if (order_by != null) {
-      to_send["_order_by"] = order_by;
+    if (orderBy != null) {
+      to_send["_order_by"] = orderBy;
     }
     if (limit != null) {
       to_send["_limit"] = limit;
@@ -36,7 +36,7 @@ abstract class AbstractCollectionManager<T extends Model> {
     }
 
     return ajax.requestDecodePage(
-      this.ctor,
+      this.constructor,
       "GET",
       this.collectionUrl,
       to_send,
@@ -48,9 +48,9 @@ abstract class AbstractCollectionManager<T extends Model> {
       query: query,
       limit: 2,
     );
-    if (page.objects_count != 1) {
+    if (page.objectsCount != 1) {
       throw APIProgrammingError(
-        '.get() must receive exactly 1 object, but got ${page.objects_count}',
+        '.get() must receive exactly 1 object, but got ${page.objectsCount}',
       );
     }
 

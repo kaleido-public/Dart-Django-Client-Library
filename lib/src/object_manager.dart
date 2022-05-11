@@ -1,5 +1,4 @@
-import 'ajax_driver.dart';
-import 'model.dart';
+import '../django_client_framework.dart';
 
 class ObjectManager<T extends Model> {
   late T _original;
@@ -63,8 +62,11 @@ class ObjectManager<T extends Model> {
 
   Future<ObjectManager<T>> update(data) async {
     var model = await ajax.requestDecodeFromModel(
-        this._updated, 'PATCH', this.objectUrl,
-        data: data);
+      this._updated,
+      'PATCH',
+      this.objectUrl,
+      data: data,
+    );
     this._original = model.clone() as T;
     this._updated = model.clone() as T;
     return this;
